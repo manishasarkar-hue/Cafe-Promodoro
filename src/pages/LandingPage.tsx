@@ -226,14 +226,15 @@ export const LandingPage: React.FC = () => {
                 <ChibiCharacter
                   avatar={{
                     gender: 'girl',
-                    name: 'Yuki',
-                    hairStyle: 'bob',
+                    name: 'Manisha',
+                    hairStyle: 'wavy',
                     hairColor: '#4A3525',
                     outfit: 'cardigan',
-                    outfitColor: '#FFCCD5',
-                    accessory: 'glasses',
+                    outfitColor: '#D5C4EB',
+                    accessory: 'none',
+                    expression: 'normal',
                   }}
-                  size={145}
+                  size={155}
                   activity="typing"
                 />
                 <div
@@ -245,7 +246,7 @@ export const LandingPage: React.FC = () => {
                     marginTop: '0.4rem',
                   }}
                 >
-                  Yuki ☕
+                  Manisha ☕
                 </div>
               </div>
 

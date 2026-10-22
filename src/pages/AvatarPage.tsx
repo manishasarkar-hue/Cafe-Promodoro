@@ -1,534 +1,673 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
-import { Gender } from '../types';
-import { Sparkles, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { Expression, Gender } from '../types';
+import {
+  Sparkles,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Check,
+  Heart,
+  Smile,
+  Eye,
+  Shirt,
+  User,
+  Coffee,
+  MapPin,
+  Users,
+  Headphones,
+  Award,
+} from 'lucide-react';
 
-const HAIR_STYLES_GIRL = [
-  { id: 'bob', label: 'Classic Bob' },
-  { id: 'curly', label: 'Soft Wavy' },
-  { id: 'ponytail', label: 'High Ponytail' },
-  { id: 'fluffy', label: 'Fluffy Bangs' },
+interface HairOption {
+  id: string;
+  name: string;
+  gender: Gender;
+}
+
+interface OutfitOption {
+  id: string;
+  name: string;
+  color: string;
+  desc: string;
+  icon: string;
+}
+
+interface AccessoryOption {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+const HAIR_OPTIONS: HairOption[] = [
+  { id: 'wavy', name: 'Soft Wavy', gender: 'girl' },
+  { id: 'bun', name: 'Messy Bun', gender: 'girl' },
+  { id: 'bob', name: 'Stylish Bob', gender: 'girl' },
+  { id: 'ponytail', name: 'Cute Ponytail', gender: 'girl' },
+  { id: 'halfup', name: 'Half-Up Bow', gender: 'girl' },
+  { id: 'messy', name: 'K-Pop Fringe', gender: 'boy' },
+  { id: 'short', name: 'Tidy Two-Block', gender: 'boy' },
+  { id: 'fluffy', name: 'Soft Curls', gender: 'boy' },
 ];
 
-const HAIR_STYLES_BOY = [
-  { id: 'messy', label: 'Messy Fringe' },
-  { id: 'short', label: 'Tidy Part' },
-  { id: 'fluffy', label: 'Soft Fluffy' },
-  { id: 'bob', label: 'Under-cut' },
+const OUTFIT_OPTIONS: OutfitOption[] = [
+  { id: 'cardigan', name: 'Pastel Cardigan', color: '#D5C4EB', desc: 'Lavender knit + plaid pleated skirt', icon: '🧥' },
+  { id: 'blouse', name: 'Ribbon Blouse', color: '#FFFDF9', desc: 'Cream silk with black ribbon bow', icon: '👔' },
+  { id: 'pink_hoodie', name: 'Blush Hoodie', color: '#FFCAD4', desc: 'Oversized fleece + pleated skirt', icon: '🎽' },
+  { id: 'blazer', name: 'Academia Blazer', color: '#5A473E', desc: 'Tailored jacket + structured collar', icon: '🥼' },
+  { id: 'blue_knit', name: 'Baby Blue Knit', color: '#B8C0FF', desc: 'Cable-knit sweater + tennis skirt', icon: '🧶' },
 ];
 
-const HAIR_COLORS = [
-  { hex: '#4A3525', label: 'Warm Chestnut' },
-  { hex: '#2B2D42', label: 'Midnight Jet' },
-  { hex: '#8D5B4C', label: 'Milk Chocolate' },
-  { hex: '#DDA15E', label: 'Honey Blonde' },
-  { hex: '#A4133C', label: 'Berry Auburn' },
-  { hex: '#6D597A', label: 'Pastel Lilac' },
+const ACCESSORY_OPTIONS: AccessoryOption[] = [
+  { id: 'none', name: 'None', icon: '✨' },
+  { id: 'headphones', name: 'Headphones', icon: '🎧' },
+  { id: 'bow', name: 'Silk Ribbon', icon: '🎀' },
+  { id: 'hair_clip', name: 'Daisy Clips', icon: '🌼' },
+  { id: 'glasses', name: 'Wire Glasses', icon: '👓' },
+  { id: 'beret', name: 'French Beret', icon: '👒' },
 ];
 
-const OUTFITS = [
-  { id: 'cardigan', label: 'Cozy Knit Cardigan' },
-  { id: 'sweater', label: 'Chunky Wool Sweater' },
-  { id: 'blazer', label: 'Academy Blazer' },
-  { id: 'hoodie', label: 'Oversized Hoodie' },
-  { id: 'apron', label: 'Barista Linen Apron' },
-];
-
-const OUTFIT_COLORS = [
-  { hex: '#FFCCD5', label: 'Blush Pink' },
-  { hex: '#CDB4DB', label: 'Soft Lavender' },
-  { hex: '#B7E4C7', label: 'Sage Mint' },
-  { hex: '#DDB892', label: 'Oatmeal Beige' },
-  { hex: '#B8C0FF', label: 'Baby Blue' },
-  { hex: '#FFE5D9', label: 'Warm Peach' },
-];
-
-const ACCESSORIES = [
-  { id: 'none', label: 'None' },
-  { id: 'glasses', label: 'Rose Gold Glasses 👓' },
-  { id: 'cat_ears', label: 'Pastel Cat Ears 🐱' },
-  { id: 'bow', label: 'Silk Hair Ribbon 🎀' },
-  { id: 'headphones', label: 'Lofi Headset 🎧' },
+const EXPRESSIONS: { id: Expression; label: string; emoji: string }[] = [
+  { id: 'normal', label: 'Normal', emoji: '🌸' },
+  { id: 'happy', label: 'Happy', emoji: '✨' },
+  { id: 'wink', label: 'Wink', emoji: '😉' },
+  { id: 'thinking', label: 'Thinking', emoji: '💭' },
 ];
 
 export const AvatarPage: React.FC = () => {
-  const { avatar, updateAvatar, setScreen } = useApp();
+  const { avatar, updateAvatar, setScreen, navigateWithCheck } = useApp();
 
-  const handleGenderChange = (gender: Gender) => {
+  const [isEditingName, setIsEditingName] = useState(false);
+
+  const handleGenderToggle = (g: Gender) => {
     updateAvatar({
-      gender,
-      hairStyle: gender === 'girl' ? 'bob' : 'messy',
-      name: avatar.name || (gender === 'girl' ? 'Yuki' : 'Haru'),
+      gender: g,
+      hairStyle: g === 'girl' ? 'wavy' : 'messy',
     });
   };
 
+  const handleConfirmNext = () => {
+    setScreen('cafe');
+  };
+
   return (
-    <div style={{ minHeight: 'calc(100vh - 70px)', padding: '2rem 1.25rem 4rem' }}>
-      <div style={{ maxWidth: 1060, margin: '0 auto' }}>
-        {/* Navigation Bar Back */}
-        <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button
-            onClick={() => setScreen('landing')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              color: '#8C7A6B',
-              fontSize: '0.9rem',
-              fontWeight: 600,
-            }}
-          >
-            <ArrowLeft size={16} />
-            <span>Back to Home</span>
-          </button>
+    <div
+      style={{
+        minHeight: 'calc(100vh - 70px)',
+        background: 'linear-gradient(135deg, #FFF6F3 0%, #FFEBE6 40%, #FFF0EB 100%)',
+        padding: '1.5rem 1rem 3rem',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Background Sunlit Café Illustration Ambient Layer */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          opacity: 0.12,
+          backgroundImage: `
+            radial-gradient(circle at 20% 30%, #FFB5A7 0%, transparent 40%),
+            radial-gradient(circle at 80% 20%, #FCD5CE 0%, transparent 50%),
+            radial-gradient(circle at 50% 80%, #FFE5D9 0%, transparent 60%)
+          `,
+          pointerEvents: 'none',
+        }}
+      />
 
-          <div
-            style={{
-              fontFamily: 'var(--font-cute)',
-              fontSize: '1.1rem',
-              color: 'var(--c-strawberry-dark)',
-              fontWeight: 700,
-            }}
-          >
-            Step 1 of 5: Character Creation
-          </div>
-        </div>
-
-        {/* Title */}
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              background: '#FFE3E8',
-              color: 'var(--c-strawberry-dark)',
-              padding: '0.25rem 0.85rem',
-              borderRadius: 'var(--radius-pill)',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              marginBottom: '0.5rem',
-            }}
-          >
-            <Sparkles size={14} />
-            <span>Meet your study buddy</span>
-          </div>
-          <h1
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '2.4rem',
-              fontWeight: 800,
-              color: '#3A2820',
-            }}
-          >
-            Customize Your Chibi Avatar
-          </h1>
-          <p style={{ color: '#8C7A6B', fontSize: '0.95rem' }}>
-            Choose your look, outfits, and accessories to accompany you at the café.
-          </p>
-        </div>
-
-        {/* Two-Column Editor Layout */}
+      <div
+        style={{
+          maxWidth: 1320,
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(280px, 440px) 1fr',
+          gap: '2rem',
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 1,
+        }}
+        className="avatar-creator-grid"
+      >
+        {/* ==================== LEFT: FULL-BODY CHARACTER SHOWCASE STAGE ==================== */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '2.5rem',
-            alignItems: 'start',
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2.5rem 1.5rem',
+            minHeight: 580,
           }}
         >
-          {/* Left: Interactive Live Character Stage */}
+          {/* Subtle Sunlit Window Beam Background Effect */}
           <div
             style={{
-              background: 'linear-gradient(135deg, #FFF0F3 0%, #FFE3E8 100%)',
-              borderRadius: 'var(--radius-lg)',
-              border: '3px solid #FFCCD5',
-              boxShadow: 'var(--shadow-medium)',
-              padding: '3rem 2rem 2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              position: 'sticky',
-              top: 90,
+              position: 'absolute',
+              width: 320,
+              height: 480,
+              borderRadius: '200px 200px 80px 80px',
+              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 235, 230, 0.45) 100%)',
+              border: '2px solid rgba(255, 255, 255, 0.9)',
+              boxShadow: '0 16px 40px rgba(220, 160, 150, 0.15)',
+              filter: 'blur(0.5px)',
+              zIndex: 0,
+            }}
+          />
+
+          {/* Floating Aesthetic Details */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 30,
+              left: 20,
+              fontSize: '1.4rem',
+              animation: 'floatGentle 4s ease-in-out infinite',
+              zIndex: 1,
             }}
           >
-            <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  top: -20,
-                  right: -10,
-                  fontSize: '1.2rem',
-                  animation: 'floatGentle 3s ease-in-out infinite',
-                }}
-              >
-                ✨
-              </div>
-              <ChibiCharacter avatar={avatar} size={210} activity="idle" />
-            </div>
+            🌸
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              top: 70,
+              right: 30,
+              fontSize: '1.5rem',
+              animation: 'sparkleTwinkle 3s ease-in-out infinite',
+              zIndex: 1,
+            }}
+          >
+            ✨
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 90,
+              left: 35,
+              fontSize: '1.3rem',
+              opacity: 0.8,
+              zIndex: 1,
+            }}
+          >
+            🍃
+          </div>
 
-            {/* Character Badge Name Tag */}
+          {/* Character Stage Pedestal */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 55,
+              width: 220,
+              height: 26,
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.75)',
+              border: '2px solid rgba(255, 200, 190, 0.6)',
+              boxShadow: '0 8px 20px rgba(180, 130, 120, 0.12)',
+              zIndex: 1,
+            }}
+          />
+
+          {/* High-Definition 2D Anime Chibi Character */}
+          <div style={{ position: 'relative', zIndex: 2, transform: 'scale(1.02)' }}>
+            <ChibiCharacter
+              avatar={avatar}
+              size={210}
+              activity="idle"
+            />
+          </div>
+
+          {/* Stage Gender & Angle Toggle Arrows */}
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 3,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1.25rem',
+              marginTop: '1.5rem',
+            }}
+          >
+            <button
+              onClick={() => handleGenderToggle(avatar.gender === 'girl' ? 'boy' : 'girl')}
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: '50%',
+                background: '#FFFFFF',
+                border: '1.5px solid #FFD5CC',
+                boxShadow: '0 4px 12px rgba(180, 120, 110, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#8A584C',
+                transition: 'all 0.2s ease',
+              }}
+              title="Toggle Girl / Boy Model"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
             <div
               style={{
                 background: '#FFFFFF',
                 borderRadius: 'var(--radius-pill)',
-                border: '1.5px solid var(--c-cream-border)',
-                padding: '0.45rem 1.4rem',
-                boxShadow: 'var(--shadow-soft)',
-                textAlign: 'center',
-                marginBottom: '1rem',
+                padding: '0.35rem 1.1rem',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                color: '#6A4A3E',
+                border: '1.5px solid #FFE0D6',
+                boxShadow: '0 4px 12px rgba(180, 120, 110, 0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
               }}
             >
-              <div
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '1.15rem',
-                  fontWeight: 700,
-                  color: '#4A3525',
-                }}
-              >
-                {avatar.name || 'Unnamed Scholar'}
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#8C7A6B' }}>
-                {avatar.gender === 'girl' ? 'Sweet Scholar' : 'Gentle Thinker'}
-              </div>
+              <span>{avatar.gender === 'girl' ? '🌸 Girl Chibi' : '🌿 Boy Chibi'}</span>
             </div>
 
-            {/* Quick Preview Pose Chips */}
-            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <span
+            <button
+              onClick={() => handleGenderToggle(avatar.gender === 'girl' ? 'boy' : 'girl')}
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: '50%',
+                background: '#FFFFFF',
+                border: '1.5px solid #FFD5CC',
+                boxShadow: '0 4px 12px rgba(180, 120, 110, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#8A584C',
+                transition: 'all 0.2s ease',
+              }}
+              title="Toggle Girl / Boy Model"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* ==================== RIGHT: AESTHETIC CUSTOMIZATION CARD ==================== */}
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.94)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '28px',
+            border: '2px solid #FFE4DC',
+            boxShadow: '0 20px 50px rgba(190, 140, 130, 0.15)',
+            padding: '2.25rem 2.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem',
+          }}
+          className="avatar-card-panel"
+        >
+          {/* Header Row: Title + Name Input */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              paddingBottom: '0.75rem',
+              borderBottom: '1px solid #F6E6DF',
+            }}
+          >
+            <div>
+              <div
                 style={{
-                  fontSize: '0.75rem',
-                  background: 'rgba(255,255,255,0.8)',
-                  padding: '0.2rem 0.6rem',
-                  borderRadius: 'var(--radius-pill)',
-                  color: '#8C7A6B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '1.8rem',
+                  fontWeight: 800,
+                  color: '#4A342B',
                 }}
               >
-                Hair: {avatar.hairStyle}
-              </span>
-              <span
+                <Heart size={20} fill="#FF85A1" color="#FF85A1" />
+                <span>Create Your Avatar</span>
+              </div>
+              <p style={{ fontSize: '0.88rem', color: '#9C7A6E', marginTop: '0.15rem' }}>
+                Choose your style, make it yours!
+              </p>
+            </div>
+
+            {/* "Your Name" Editable Badge */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+              <div
                 style={{
-                  fontSize: '0.75rem',
-                  background: 'rgba(255,255,255,0.8)',
-                  padding: '0.2rem 0.6rem',
-                  borderRadius: 'var(--radius-pill)',
-                  color: '#8C7A6B',
+                  fontSize: '0.74rem',
+                  color: '#A08074',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: '0.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
                 }}
               >
-                Outfit: {avatar.outfit}
-              </span>
+                <span>Your Name</span>
+                <span style={{ color: '#FF85A1' }}>🌸</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  background: '#FFF9F6',
+                  border: '1.5px solid #FFD9D0',
+                  borderRadius: 'var(--radius-pill)',
+                  padding: '0.4rem 0.85rem',
+                  boxShadow: '0 2px 8px rgba(180, 120, 110, 0.08)',
+                }}
+              >
+                <input
+                  type="text"
+                  value={avatar.name}
+                  maxLength={16}
+                  onChange={(e) => updateAvatar({ name: e.target.value })}
+                  placeholder="Enter name..."
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: '0.92rem',
+                    fontWeight: 700,
+                    color: '#4A342B',
+                    width: 110,
+                  }}
+                />
+                <Pencil size={13} color="#C48E7E" />
+              </div>
             </div>
           </div>
 
-          {/* Right: Customization Controls Card */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 'var(--radius-lg)',
-              border: '2px solid var(--c-cream-border)',
-              boxShadow: 'var(--shadow-soft)',
-              padding: '2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.75rem',
-            }}
-          >
-            {/* 1. Character Name */}
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: '#4A3525',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Character Name
-              </label>
-              <input
-                type="text"
-                value={avatar.name}
-                maxLength={18}
-                onChange={(e) => updateAvatar({ name: e.target.value })}
-                placeholder="Enter character name..."
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1.5px solid var(--c-cream-border)',
-                  background: '#FAF7F2',
-                  fontSize: '0.95rem',
-                  fontWeight: 600,
-                  color: '#3A2820',
-                }}
-              />
+          {/* ==================== 1. HAIR STYLE ROW ==================== */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.92rem',
+                fontWeight: 700,
+                color: '#4A342B',
+                marginBottom: '0.75rem',
+              }}
+            >
+              <span>👩</span>
+              <span>Hair Style</span>
             </div>
 
-            {/* 2. Gender Selection */}
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: '#4A3525',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Gender Style
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <button
-                  type="button"
-                  onClick={() => handleGenderChange('girl')}
-                  style={{
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    border: avatar.gender === 'girl' ? '2px solid var(--c-strawberry-main)' : '1.5px solid var(--c-cream-border)',
-                    background: avatar.gender === 'girl' ? 'var(--c-strawberry-soft)' : '#FAF7F2',
-                    color: avatar.gender === 'girl' ? 'var(--c-strawberry-dark)' : '#6B584C',
-                    fontWeight: 700,
-                    fontSize: '0.92rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                  }}
-                >
-                  <span>🌸</span>
-                  <span>Girl Avatar</span>
-                  {avatar.gender === 'girl' && <Check size={16} />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleGenderChange('boy')}
-                  style={{
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    border: avatar.gender === 'boy' ? '2px solid var(--c-lavender-main)' : '1.5px solid var(--c-cream-border)',
-                    background: avatar.gender === 'boy' ? '#EDE8F5' : '#FAF7F2',
-                    color: avatar.gender === 'boy' ? 'var(--c-lavender-main)' : '#6B584C',
-                    fontWeight: 700,
-                    fontSize: '0.92rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                  }}
-                >
-                  <span>🌿</span>
-                  <span>Boy Avatar</span>
-                  {avatar.gender === 'boy' && <Check size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {/* 3. Hairstyle */}
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: '#4A3525',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Hairstyle
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
-                {(avatar.gender === 'girl' ? HAIR_STYLES_GIRL : HAIR_STYLES_BOY).map((style) => (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))',
+                gap: '0.75rem',
+              }}
+            >
+              {HAIR_OPTIONS.filter((h) => h.gender === avatar.gender).map((style) => {
+                const isSelected = avatar.hairStyle === style.id;
+                return (
                   <button
                     key={style.id}
                     onClick={() => updateAvatar({ hairStyle: style.id })}
                     style={{
-                      padding: '0.6rem 0.85rem',
-                      borderRadius: 'var(--radius-md)',
-                      border: avatar.hairStyle === style.id ? '2px solid #4A3525' : '1px solid var(--c-cream-border)',
-                      background: avatar.hairStyle === style.id ? '#F5EFEB' : '#FFFFFF',
-                      fontWeight: avatar.hairStyle === style.id ? 700 : 500,
-                      fontSize: '0.85rem',
-                      textAlign: 'left',
+                      background: isSelected ? '#FFF2EE' : '#FFFDFB',
+                      border: isSelected ? '2px solid #FF85A1' : '1.5px solid #F0DCD4',
+                      borderRadius: '16px',
+                      padding: '0.65rem 0.5rem',
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      boxShadow: isSelected ? '0 4px 14px rgba(255, 133, 161, 0.25)' : '0 2px 8px rgba(180, 130, 120, 0.06)',
+                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      transform: isSelected ? 'translateY(-2px)' : 'none',
                     }}
                   >
-                    <span>{style.label}</span>
-                    {avatar.hairStyle === style.id && <Check size={14} />}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 4. Hair Color Palette */}
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: '#4A3525',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Hair Color
-              </label>
-              <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-                {HAIR_COLORS.map((color) => {
-                  const isSelected = avatar.hairColor === color.hex;
-                  return (
-                    <button
-                      key={color.hex}
-                      onClick={() => updateAvatar({ hairColor: color.hex })}
-                      title={color.label}
+                    {/* Mini Head preview */}
+                    <div style={{ height: 60, width: 60, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ChibiCharacter
+                        avatar={{
+                          ...avatar,
+                          hairStyle: style.id,
+                        }}
+                        size={56}
+                        activity="idle"
+                        showShadow={false}
+                      />
+                    </div>
+                    <div
                       style={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: '50%',
-                        background: color.hex,
-                        border: isSelected ? '3px solid #FFFFFF' : '2px solid #E0D3C5',
-                        boxShadow: isSelected ? '0 0 0 2px #4A3525' : 'none',
-                        cursor: 'pointer',
-                        transition: 'transform 0.15s ease',
-                        transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                        fontSize: '0.75rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        color: isSelected ? '#C43D5D' : '#6A4A3E',
+                        marginTop: '0.35rem',
+                        textAlign: 'center',
                       }}
-                    />
-                  );
-                })}
-              </div>
+                    >
+                      {style.name}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ==================== 2. OUTFIT ROW ==================== */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.92rem',
+                fontWeight: 700,
+                color: '#4A342B',
+                marginBottom: '0.75rem',
+              }}
+            >
+              <span>👚</span>
+              <span>Outfit</span>
             </div>
 
-            {/* 5. Outfit Style */}
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: '#4A3525',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Outfit Type
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
-                {OUTFITS.map((outfit) => (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(115px, 1fr))',
+                gap: '0.75rem',
+              }}
+            >
+              {OUTFIT_OPTIONS.map((out) => {
+                const isSelected = avatar.outfit === out.id;
+                return (
                   <button
-                    key={outfit.id}
-                    onClick={() => updateAvatar({ outfit: outfit.id })}
+                    key={out.id}
+                    onClick={() => updateAvatar({ outfit: out.id, outfitColor: out.color })}
                     style={{
-                      padding: '0.55rem 0.75rem',
-                      borderRadius: 'var(--radius-sm)',
-                      border: avatar.outfit === outfit.id ? '2px solid var(--c-strawberry-main)' : '1px solid var(--c-cream-border)',
-                      background: avatar.outfit === outfit.id ? 'var(--c-strawberry-soft)' : '#FAF7F2',
-                      fontSize: '0.82rem',
-                      fontWeight: 600,
-                      color: '#4A3525',
-                      textAlign: 'left',
+                      background: isSelected ? '#FFF2EE' : '#FFFDFB',
+                      border: isSelected ? '2px solid #FF85A1' : '1.5px solid #F0DCD4',
+                      borderRadius: '16px',
+                      padding: '0.65rem 0.5rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      boxShadow: isSelected ? '0 4px 14px rgba(255, 133, 161, 0.25)' : '0 2px 8px rgba(180, 130, 120, 0.06)',
+                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      transform: isSelected ? 'translateY(-2px)' : 'none',
                     }}
                   >
-                    {outfit.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 6. Outfit Color */}
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: '#4A3525',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Outfit Pastel Shade
-              </label>
-              <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-                {OUTFIT_COLORS.map((color) => {
-                  const isSelected = avatar.outfitColor === color.hex;
-                  return (
-                    <button
-                      key={color.hex}
-                      onClick={() => updateAvatar({ outfitColor: color.hex })}
-                      title={color.label}
+                    <div
                       style={{
-                        width: 38,
-                        height: 38,
+                        width: 44,
+                        height: 44,
                         borderRadius: '50%',
-                        background: color.hex,
-                        border: isSelected ? '3px solid #FFFFFF' : '2px solid #E0D3C5',
-                        boxShadow: isSelected ? '0 0 0 2px var(--c-strawberry-main)' : 'none',
-                        cursor: 'pointer',
-                        transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                        background: out.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.4rem',
+                        boxShadow: '0 3px 8px rgba(0,0,0,0.08)',
+                        border: '1.5px solid #FFF',
                       }}
-                    />
-                  );
-                })}
-              </div>
+                    >
+                      {out.icon}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '0.75rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        color: isSelected ? '#C43D5D' : '#6A4A3E',
+                        marginTop: '0.45rem',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {out.name}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ==================== 3. ACCESSORIES ROW ==================== */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.92rem',
+                fontWeight: 700,
+                color: '#4A342B',
+                marginBottom: '0.75rem',
+              }}
+            >
+              <span>🎀</span>
+              <span>Accessories</span>
             </div>
 
-            {/* 7. Accessories */}
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: '#4A3525',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Accessory
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
-                {ACCESSORIES.map((acc) => (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(85px, 1fr))',
+                gap: '0.6rem',
+              }}
+            >
+              {ACCESSORY_OPTIONS.map((acc) => {
+                const isSelected = (avatar.accessory || 'none') === acc.id;
+                return (
                   <button
                     key={acc.id}
                     onClick={() => updateAvatar({ accessory: acc.id })}
                     style={{
-                      padding: '0.55rem 0.75rem',
-                      borderRadius: 'var(--radius-sm)',
-                      border: avatar.accessory === acc.id ? '2px solid var(--c-lavender-main)' : '1px solid var(--c-cream-border)',
-                      background: avatar.accessory === acc.id ? '#EDE8F5' : '#FAF7F2',
-                      fontSize: '0.82rem',
-                      fontWeight: 600,
-                      color: '#4A3525',
-                      textAlign: 'left',
+                      background: isSelected ? '#FFF2EE' : '#FFFDFB',
+                      border: isSelected ? '2px solid #FF85A1' : '1.5px solid #F0DCD4',
+                      borderRadius: '16px',
+                      padding: '0.6rem 0.4rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      boxShadow: isSelected ? '0 4px 14px rgba(255, 133, 161, 0.25)' : 'none',
+                      transition: 'all 0.2s ease',
                     }}
                   >
-                    {acc.label}
+                    <span style={{ fontSize: '1.4rem', marginBottom: '0.2rem' }}>{acc.icon}</span>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        color: isSelected ? '#C43D5D' : '#6A4A3E',
+                      }}
+                    >
+                      {acc.name}
+                    </span>
                   </button>
-                ))}
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ==================== 4. EXPRESSION ROW & NEXT BUTTON ==================== */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1.5rem',
+              paddingTop: '0.75rem',
+              borderTop: '1px solid #F6E6DF',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  color: '#4A342B',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                <span>👁️</span>
+                <span>Character Expression</span>
+              </div>
+              <div style={{ display: 'flex', gap: '0.45rem' }}>
+                {EXPRESSIONS.map((expr) => {
+                  const isSelected = (avatar.expression || 'normal') === expr.id;
+                  return (
+                    <button
+                      key={expr.id}
+                      onClick={() => updateAvatar({ expression: expr.id })}
+                      style={{
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: 'var(--radius-pill)',
+                        fontSize: '0.78rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        background: isSelected ? '#FF85A1' : '#FFF9F6',
+                        color: isSelected ? '#FFFFFF' : '#6A4A3E',
+                        border: isSelected ? '1.5px solid #FF85A1' : '1.5px solid #F0DCD4',
+                        boxShadow: isSelected ? '0 3px 8px rgba(255, 133, 161, 0.3)' : 'none',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <span>{expr.emoji} </span>
+                      <span>{expr.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Confirmation Next Button */}
+            {/* Next Button (Matching reference design!) */}
             <button
-              onClick={() => setScreen('cafe')}
+              onClick={handleConfirmNext}
               style={{
-                marginTop: '1rem',
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                background: 'linear-gradient(135deg, #FF758F 0%, #FF4D6D 100%)',
+                gap: '0.6rem',
+                background: 'linear-gradient(135deg, #FF758F 0%, #D85770 100%)',
                 color: '#FFFFFF',
-                padding: '0.95rem',
+                padding: '0.95rem 2.2rem',
                 borderRadius: 'var(--radius-pill)',
                 fontSize: '1.05rem',
-                fontWeight: 700,
-                boxShadow: '0 6px 20px rgba(255, 77, 109, 0.35)',
+                fontWeight: 800,
+                boxShadow: '0 8px 24px rgba(216, 87, 112, 0.35)',
+                border: '2px solid rgba(255, 255, 255, 0.6)',
+                cursor: 'pointer',
+                transition: 'all 0.25s ease',
               }}
+              className="enter-cafe-btn"
             >
-              <span>Confirm & Choose Café</span>
+              <span>Next</span>
               <ArrowRight size={18} />
             </button>
           </div>
