@@ -1,122 +1,65 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import React from 'react';
+import { AppProvider, useApp } from './context/AppContext';
+import { Header } from './components/layout/Header';
+import { SoundStudioModal } from './components/audio/SoundStudioModal';
+import { LandingPage } from './pages/LandingPage';
+import { AvatarPage } from './pages/AvatarPage';
+import { CafeSelectPage } from './pages/CafeSelectPage';
+import { DrinksPage } from './pages/DrinksPage';
+import { CafeOverviewPage } from './pages/CafeOverviewPage';
+import { PersonalStudyPage } from './pages/PersonalStudyPage';
+import { SocialStudyPage } from './pages/SocialStudyPage';
+import { RewardsPage } from './pages/RewardsPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+const MainContent: React.FC = () => {
+  const { screen } = useApp();
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <main style={{ minHeight: 'calc(100vh - 120px)' }}>
+      {screen === 'landing' && <LandingPage />}
+      {screen === 'avatar' && <AvatarPage />}
+      {screen === 'cafe' && <CafeSelectPage />}
+      {screen === 'drinks' && <DrinksPage />}
+      {screen === 'overview' && <CafeOverviewPage />}
+      {screen === 'personal_study' && <PersonalStudyPage />}
+      {screen === 'social_study' && <SocialStudyPage />}
+      {screen === 'rewards' && <RewardsPage />}
+      <SoundStudioModal />
+    </main>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AppProvider>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <MainContent />
+        <footer
+          style={{
+            marginTop: 'auto',
+            background: 'rgba(252, 249, 242, 0.95)',
+            borderTop: '1px solid var(--c-cream-border)',
+            padding: '1.25rem',
+            textAlign: 'center',
+            fontSize: '0.8rem',
+            color: '#8C7A6B',
+          }}
         >
-          Count is {count}
-        </button>
-      </section>
+          <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span>☕</span>
+              <span style={{ fontWeight: 700, color: 'var(--c-strawberry-dark)' }}>Cafe Pomodoro</span>
+              <span>• Your little corner of calm</span>
+            </div>
+            <div style={{ fontFamily: 'var(--font-cute)', fontSize: '0.95rem', color: '#6F5E53' }}>
+              달콤하고 따뜻한 집중의 시간 ✨
+            </div>
+          </div>
+        </footer>
+      </div>
+    </AppProvider>
+  );
+};
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
-
-export default App
+export default App;
