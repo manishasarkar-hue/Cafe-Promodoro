@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
+import { CharacterViewer3D } from '../components/character3d/CharacterViewer3D';
 import { Expression, Gender } from '../types';
 import {
   Sparkles,
@@ -19,6 +20,7 @@ import {
   Users,
   Headphones,
   Award,
+  Box,
 } from 'lucide-react';
 
 interface HairOption {
@@ -80,6 +82,7 @@ export const AvatarPage: React.FC = () => {
   const { avatar, updateAvatar, setScreen, navigateWithCheck } = useApp();
 
   const [isEditingName, setIsEditingName] = useState(false);
+  const [stageMode, setStageMode] = useState<'3d' | '2d'>('3d');
 
   const handleGenderToggle = (g: Gender) => {
     updateAvatar({
@@ -89,6 +92,10 @@ export const AvatarPage: React.FC = () => {
   };
 
   const handleConfirmNext = () => {
+    updateAvatar({
+      modelUrl: '/models/model(1).glb',
+      is3D: true,
+    });
     setScreen('cafe');
   };
 
@@ -138,156 +145,223 @@ export const AvatarPage: React.FC = () => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '2.5rem 1.5rem',
+            padding: '1rem 0.5rem',
             minHeight: 580,
           }}
         >
-          {/* Subtle Sunlit Window Beam Background Effect */}
+          {/* Mode Switcher: 3D Model (Default) vs 2D Customizer */}
           <div
             style={{
-              position: 'absolute',
-              width: 320,
-              height: 480,
-              borderRadius: '200px 200px 80px 80px',
-              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 235, 230, 0.45) 100%)',
-              border: '2px solid rgba(255, 255, 255, 0.9)',
-              boxShadow: '0 16px 40px rgba(220, 160, 150, 0.15)',
-              filter: 'blur(0.5px)',
-              zIndex: 0,
-            }}
-          />
-
-          {/* Floating Aesthetic Details */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 30,
-              left: 20,
-              fontSize: '1.4rem',
-              animation: 'floatGentle 4s ease-in-out infinite',
-              zIndex: 1,
-            }}
-          >
-            🌸
-          </div>
-          <div
-            style={{
-              position: 'absolute',
-              top: 70,
-              right: 30,
-              fontSize: '1.5rem',
-              animation: 'sparkleTwinkle 3s ease-in-out infinite',
-              zIndex: 1,
-            }}
-          >
-            ✨
-          </div>
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 90,
-              left: 35,
-              fontSize: '1.3rem',
-              opacity: 0.8,
-              zIndex: 1,
-            }}
-          >
-            🍃
-          </div>
-
-          {/* Character Stage Pedestal */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 55,
-              width: 220,
-              height: 26,
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.75)',
-              border: '2px solid rgba(255, 200, 190, 0.6)',
-              boxShadow: '0 8px 20px rgba(180, 130, 120, 0.12)',
-              zIndex: 1,
-            }}
-          />
-
-          {/* High-Definition 2D Anime Chibi Character */}
-          <div style={{ position: 'relative', zIndex: 2, transform: 'scale(1.02)' }}>
-            <ChibiCharacter
-              avatar={avatar}
-              size={210}
-              activity="idle"
-            />
-          </div>
-
-          {/* Stage Gender & Angle Toggle Arrows */}
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 3,
               display: 'flex',
               alignItems: 'center',
-              gap: '1.25rem',
-              marginTop: '1.5rem',
+              background: 'rgba(255, 255, 255, 0.92)',
+              backdropFilter: 'blur(8px)',
+              border: '1.5px solid #FFD5CC',
+              borderRadius: 'var(--radius-pill)',
+              padding: '0.22rem',
+              marginBottom: '1rem',
+              boxShadow: '0 4px 14px rgba(180, 120, 110, 0.08)',
+              zIndex: 10,
             }}
           >
             <button
-              onClick={() => handleGenderToggle(avatar.gender === 'girl' ? 'boy' : 'girl')}
+              onClick={() => setStageMode('3d')}
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: '50%',
-                background: '#FFFFFF',
-                border: '1.5px solid #FFD5CC',
-                boxShadow: '0 4px 12px rgba(180, 120, 110, 0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#8A584C',
-                transition: 'all 0.2s ease',
-              }}
-              title="Toggle Girl / Boy Model"
-            >
-              <ChevronLeft size={20} />
-            </button>
-
-            <div
-              style={{
-                background: '#FFFFFF',
-                borderRadius: 'var(--radius-pill)',
-                padding: '0.35rem 1.1rem',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                color: '#6A4A3E',
-                border: '1.5px solid #FFE0D6',
-                boxShadow: '0 4px 12px rgba(180, 120, 110, 0.08)',
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-              }}
-            >
-              <span>{avatar.gender === 'girl' ? '🌸 Girl Chibi' : '🌿 Boy Chibi'}</span>
-            </div>
-
-            <button
-              onClick={() => handleGenderToggle(avatar.gender === 'girl' ? 'boy' : 'girl')}
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: '50%',
-                background: '#FFFFFF',
-                border: '1.5px solid #FFD5CC',
-                boxShadow: '0 4px 12px rgba(180, 120, 110, 0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#8A584C',
+                padding: '0.42rem 1.05rem',
+                borderRadius: 'var(--radius-pill)',
+                fontSize: '0.82rem',
+                fontWeight: 800,
+                background: stageMode === '3d' ? 'linear-gradient(135deg, #FF85A1 0%, #D85770 100%)' : 'transparent',
+                color: stageMode === '3d' ? '#FFFFFF' : '#7A4E42',
+                border: 'none',
+                boxShadow: stageMode === '3d' ? '0 4px 12px rgba(216, 87, 112, 0.3)' : 'none',
+                cursor: 'pointer',
                 transition: 'all 0.2s ease',
               }}
-              title="Toggle Girl / Boy Model"
             >
-              <ChevronRight size={20} />
+              <Sparkles size={14} />
+              <span>3D Character</span>
+            </button>
+            <button
+              onClick={() => setStageMode('2d')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.42rem 1.05rem',
+                borderRadius: 'var(--radius-pill)',
+                fontSize: '0.82rem',
+                fontWeight: 800,
+                background: stageMode === '2d' ? 'linear-gradient(135deg, #FF85A1 0%, #D85770 100%)' : 'transparent',
+                color: stageMode === '2d' ? '#FFFFFF' : '#7A4E42',
+                border: 'none',
+                boxShadow: stageMode === '2d' ? '0 4px 12px rgba(216, 87, 112, 0.3)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <span>🎨 2D Chibi</span>
             </button>
           </div>
+
+          {/* Conditional Stage Content: 3D Viewer or 2D Chibi */}
+          {stageMode === '3d' ? (
+            <div style={{ width: '100%', position: 'relative', zIndex: 2 }}>
+              <CharacterViewer3D height={520} />
+            </div>
+          ) : (
+            <>
+              {/* Subtle Sunlit Window Beam Background Effect */}
+              <div
+                style={{
+                  position: 'absolute',
+                  width: 320,
+                  height: 480,
+                  borderRadius: '200px 200px 80px 80px',
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 235, 230, 0.45) 100%)',
+                  border: '2px solid rgba(255, 255, 255, 0.9)',
+                  boxShadow: '0 16px 40px rgba(220, 160, 150, 0.15)',
+                  filter: 'blur(0.5px)',
+                  zIndex: 0,
+                }}
+              />
+
+              {/* Floating Aesthetic Details */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 30,
+                  left: 20,
+                  fontSize: '1.4rem',
+                  animation: 'floatGentle 4s ease-in-out infinite',
+                  zIndex: 1,
+                }}
+              >
+                🌸
+              </div>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 70,
+                  right: 30,
+                  fontSize: '1.5rem',
+                  animation: 'sparkleTwinkle 3s ease-in-out infinite',
+                  zIndex: 1,
+                }}
+              >
+                ✨
+              </div>
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 90,
+                  left: 35,
+                  fontSize: '1.3rem',
+                  opacity: 0.8,
+                  zIndex: 1,
+                }}
+              >
+                🍃
+              </div>
+
+              {/* Character Stage Pedestal */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 55,
+                  width: 220,
+                  height: 26,
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.75)',
+                  border: '2px solid rgba(255, 200, 190, 0.6)',
+                  boxShadow: '0 8px 20px rgba(180, 130, 120, 0.12)',
+                  zIndex: 1,
+                }}
+              />
+
+              {/* High-Definition 2D Anime Chibi Character */}
+              <div style={{ position: 'relative', zIndex: 2, transform: 'scale(1.02)' }}>
+                <ChibiCharacter
+                  avatar={avatar}
+                  size={210}
+                  activity="idle"
+                />
+              </div>
+
+              {/* Stage Gender & Angle Toggle Arrows */}
+              <div
+                style={{
+                  position: 'relative',
+                  zIndex: 3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1.25rem',
+                  marginTop: '1.5rem',
+                }}
+              >
+                <button
+                  onClick={() => handleGenderToggle(avatar.gender === 'girl' ? 'boy' : 'girl')}
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: '50%',
+                    background: '#FFFFFF',
+                    border: '1.5px solid #FFD5CC',
+                    boxShadow: '0 4px 12px rgba(180, 120, 110, 0.12)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#8A584C',
+                    transition: 'all 0.2s ease',
+                  }}
+                  title="Toggle Girl / Boy Model"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+
+                <div
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: 'var(--radius-pill)',
+                    padding: '0.35rem 1.1rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    color: '#6A4A3E',
+                    border: '1.5px solid #FFE0D6',
+                    boxShadow: '0 4px 12px rgba(180, 120, 110, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                  }}
+                >
+                  <span>{avatar.gender === 'girl' ? '🌸 Girl Chibi' : '🌿 Boy Chibi'}</span>
+                </div>
+
+                <button
+                  onClick={() => handleGenderToggle(avatar.gender === 'girl' ? 'boy' : 'girl')}
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: '50%',
+                    background: '#FFFFFF',
+                    border: '1.5px solid #FFD5CC',
+                    boxShadow: '0 4px 12px rgba(180, 120, 110, 0.12)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#8A584C',
+                    transition: 'all 0.2s ease',
+                  }}
+                  title="Toggle Girl / Boy Model"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* ==================== RIGHT: AESTHETIC CUSTOMIZATION CARD ==================== */}

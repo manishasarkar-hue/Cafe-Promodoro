@@ -10,6 +10,8 @@ export interface AvatarConfig {
   outfitColor?: string;
   accessory?: string; // 'none' | 'headphones' | 'bow' | 'hair_clip' | 'glasses' | 'beret' | 'cat_ears' | 'bag'
   expression?: Expression;
+  modelUrl?: string;
+  is3D?: boolean;
 }
 
 export type CafeId = 'strawberry' | 'mocha' | 'matcha' | 'blue-moon';

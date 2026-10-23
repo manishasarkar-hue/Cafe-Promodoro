@@ -1,11 +1,13 @@
 import React from 'react';
-import { CafeConfig, StudySpot } from '../../types';
+import { CafeConfig, StudySpot, AvatarConfig } from '../../types';
+import { Character3D } from '../avatar/Character3D';
 import { Sparkles, Compass, MapPin } from 'lucide-react';
 
 interface CafeSceneIllustrationProps {
   cafe: CafeConfig;
   selectedSpot: StudySpot | null;
   onSelectSpot: (spot: StudySpot) => void;
+  avatar?: AvatarConfig;
   className?: string;
   isInteractive?: boolean;
 }
@@ -14,6 +16,7 @@ export const CafeSceneIllustration: React.FC<CafeSceneIllustrationProps> = ({
   cafe,
   selectedSpot,
   onSelectSpot,
+  avatar,
   className = '',
   isInteractive = true,
 }) => {
@@ -296,26 +299,38 @@ export const CafeSceneIllustration: React.FC<CafeSceneIllustrationProps> = ({
                 }}
                 className="study-spot-pin"
               >
-                {/* Glowing Location Pin Marker */}
+                {/* Glowing Location Pin Marker / 3D Avatar */}
                 <div
                   style={{
-                    width: isSelected ? 48 : 40,
-                    height: isSelected ? 48 : 40,
+                    width: isSelected ? 52 : 40,
+                    height: isSelected ? 52 : 40,
                     borderRadius: '50%',
-                    background: isSelected ? 'var(--c-strawberry-main)' : 'rgba(255, 255, 255, 0.95)',
+                    background: isSelected ? '#FFF2EE' : 'rgba(255, 255, 255, 0.95)',
                     color: isSelected ? '#FFFFFF' : cafe.theme.textPrimary,
                     boxShadow: isSelected
-                      ? '0 0 20px rgba(255, 117, 143, 0.8), 0 6px 16px rgba(0,0,0,0.2)'
+                      ? '0 0 22px rgba(255, 117, 143, 0.85), 0 6px 16px rgba(0,0,0,0.2)'
                       : '0 4px 14px rgba(0, 0, 0, 0.18)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: isSelected ? '3px solid #FFFFFF' : `2px solid ${cafe.theme.border}`,
+                    border: isSelected ? '3px solid #FF758F' : `2px solid ${cafe.theme.border}`,
                     animation: isSelected ? 'pulseGlow 2s infinite' : 'floatGentle 3s ease-in-out infinite',
                     transition: 'all 0.2s ease',
+                    overflow: 'hidden',
                   }}
                 >
-                  <MapPin size={isSelected ? 24 : 20} />
+                  {isSelected ? (
+                    <Character3D
+                      width={50}
+                      height={50}
+                      pose="compact"
+                      showShadow={false}
+                      enableFloating={true}
+                      modelUrl={avatar?.modelUrl}
+                    />
+                  ) : (
+                    <MapPin size={20} />
+                  )}
                 </div>
 
                 {/* Spot Label Card */}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { NavigationScreen } from '../../types';
+import { Character3D } from '../avatar/Character3D';
 import {
   Sparkles,
   Headphones,
@@ -19,6 +20,7 @@ import {
 export const Header: React.FC = () => {
   const {
     screen,
+    avatar,
     navigateWithCheck,
     progress,
     activeTrackId,
@@ -263,6 +265,53 @@ export const Header: React.FC = () => {
 
           {/* Right Status Counters & Audio Studio Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            {/* User 3D Avatar Profile Quick Button */}
+            <button
+              onClick={() => handleNav('avatar')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: '#FFF5F0',
+                border: '1.5px solid #FFD8CE',
+                padding: '0.15rem 0.65rem 0.15rem 0.25rem',
+                borderRadius: 'var(--radius-pill)',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: '#5C3830',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(180, 120, 110, 0.08)',
+              }}
+              title="Your 3D Avatar Character"
+            >
+              <div
+                style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  background: '#FFE5DD',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  border: '1px solid #FFB8A5',
+                }}
+              >
+                <Character3D
+                  width={26}
+                  height={26}
+                  pose="compact"
+                  showShadow={false}
+                  enableFloating={false}
+                  modelUrl={avatar.modelUrl}
+                />
+              </div>
+              <span style={{ maxWidth: 85, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {avatar.name}
+              </span>
+            </button>
+
             {/* Daily Streak */}
             <div
               style={{

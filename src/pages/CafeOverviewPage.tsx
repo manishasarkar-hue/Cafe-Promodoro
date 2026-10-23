@@ -4,6 +4,7 @@ import { CAFES } from '../data/cafes';
 import { StudySpot } from '../types';
 import { CafeSceneIllustration } from '../components/scenes/CafeSceneIllustration';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
+import { Character3D } from '../components/avatar/Character3D';
 import { DrinkCup } from '../components/chibi/DrinkCup';
 import {
   Sparkles,
@@ -197,6 +198,7 @@ export const CafeOverviewPage: React.FC = () => {
             cafe={currentCafe}
             selectedSpot={activeSpot}
             onSelectSpot={handleSpotSelect}
+            avatar={avatar}
           />
         </div>
 
@@ -224,8 +226,8 @@ export const CafeOverviewPage: React.FC = () => {
           >
             <div
               style={{
-                width: 52,
-                height: 52,
+                width: 54,
+                height: 54,
                 borderRadius: '50%',
                 background: currentCafe.theme.primaryLight,
                 display: 'flex',
@@ -234,9 +236,18 @@ export const CafeOverviewPage: React.FC = () => {
                 color: currentCafe.theme.accent,
                 boxShadow: 'var(--shadow-soft)',
                 flexShrink: 0,
+                overflow: 'hidden',
+                border: `2px solid ${currentCafe.theme.border}`,
               }}
             >
-              <MapPin size={26} />
+              <Character3D
+                width={52}
+                height={52}
+                pose="compact"
+                showShadow={false}
+                enableFloating={true}
+                modelUrl={avatar.modelUrl}
+              />
             </div>
 
             <div style={{ flex: 1 }}>
@@ -290,7 +301,30 @@ export const CafeOverviewPage: React.FC = () => {
           >
             {/* Avatar & Drink mini preview */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-              <ChibiCharacter avatar={avatar} size={50} activity="idle" showShadow={false} />
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: '50%',
+                  background: '#FFF4EE',
+                  border: '1.5px solid #FFD5CC',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--shadow-soft)',
+                  flexShrink: 0,
+                }}
+              >
+                <Character3D
+                  width={52}
+                  height={52}
+                  pose="compact"
+                  showShadow={false}
+                  enableFloating={true}
+                  modelUrl={avatar.modelUrl}
+                />
+              </div>
               {orderedDrink && (
                 <DrinkCup drink={orderedDrink} size={36} showSteam={false} />
               )}

@@ -4,6 +4,7 @@ import { VIRTUAL_STUDENTS, ENCOURAGEMENT_MESSAGES } from '../data/students';
 import { CAFES } from '../data/cafes';
 import { VirtualStudent } from '../types';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
+import { Character3D } from '../components/avatar/Character3D';
 import { DrinkCup } from '../components/chibi/DrinkCup';
 import {
   Users,
@@ -411,10 +412,16 @@ export const SocialStudyPage: React.FC = () => {
                   {isUserTable ? (
                     /* User sits on left side */
                     <div style={{ textAlign: 'center', position: 'relative' }}>
-                      <ChibiCharacter
-                        avatar={avatar}
-                        size={110}
-                        activity={timer.isRunning ? 'typing' : 'idle'}
+                      <Character3D
+                        width={130}
+                        height={140}
+                        pose="compact"
+                        lighting="cozy"
+                        showShadow={true}
+                        enableFloating={true}
+                        floatingSpeed={timer.isRunning ? 2.3 : 1.6}
+                        floatingIntensity={0.03}
+                        modelUrl={avatar.modelUrl}
                       />
                       <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--c-strawberry-dark)', marginTop: '0.25rem' }}>
                         {avatar.name} (You)

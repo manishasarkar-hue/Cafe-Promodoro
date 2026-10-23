@@ -28,6 +28,8 @@ const DEFAULT_AVATAR: AvatarConfig = {
   outfitColor: '#CDB4DB',
   accessory: 'none',
   expression: 'normal',
+  modelUrl: '/models/model(1).glb',
+  is3D: true,
 };
 
 const DEFAULT_DURATIONS: Record<PomodoroMode, PomodoroDurations> = {

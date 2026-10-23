@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
+import { Character3D } from '../components/avatar/Character3D';
 import { DrinkCup } from '../components/chibi/DrinkCup';
 import { ALL_DRINKS } from '../data/drinks';
 import { CAFES } from '../data/cafes';
@@ -18,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
-  const { setScreen, isSoundPanelOpen, setIsSoundPanelOpen, activeTrackId } = useApp();
+  const { avatar, setScreen, isSoundPanelOpen, setIsSoundPanelOpen, activeTrackId } = useApp();
 
   const previewDrink = ALL_DRINKS['strawberry_latte'];
 
@@ -221,21 +222,15 @@ export const LandingPage: React.FC = () => {
 
             {/* Cute Pair of Chibi Characters studying together */}
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '1.5rem', zIndex: 2 }}>
-              {/* Girl Chibi typing */}
+              {/* 3D Character (User / Manisha) */}
               <div style={{ textAlign: 'center' }}>
-                <ChibiCharacter
-                  avatar={{
-                    gender: 'girl',
-                    name: 'Manisha',
-                    hairStyle: 'wavy',
-                    hairColor: '#4A3525',
-                    outfit: 'cardigan',
-                    outfitColor: '#D5C4EB',
-                    accessory: 'none',
-                    expression: 'normal',
-                  }}
-                  size={155}
-                  activity="typing"
+                <Character3D
+                  width={150}
+                  height={160}
+                  pose="compact"
+                  showShadow={true}
+                  enableFloating={true}
+                  modelUrl={avatar.modelUrl}
                 />
                 <div
                   style={{
@@ -246,7 +241,7 @@ export const LandingPage: React.FC = () => {
                     marginTop: '0.4rem',
                   }}
                 >
-                  Manisha ☕
+                  {avatar.name} ☕
                 </div>
               </div>
 

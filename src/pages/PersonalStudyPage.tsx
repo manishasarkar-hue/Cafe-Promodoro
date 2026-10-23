@@ -4,6 +4,7 @@ import { CAFES } from '../data/cafes';
 import { COLLECTIBLES } from '../data/collectibles';
 import { CollectibleItem, PomodoroMode } from '../types';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
+import { Character3D } from '../components/avatar/Character3D';
 import { DrinkCup } from '../components/chibi/DrinkCup';
 import confetti from 'canvas-confetti';
 import {
@@ -277,18 +278,26 @@ export const PersonalStudyPage: React.FC = () => {
                 zIndex: 2,
               }}
             >
-              {/* Chibi Character sitting at desk */}
+              {/* 3D Character sitting at desk */}
               <div
                 style={{
-                  marginBottom: -25,
+                  marginBottom: -22,
                   zIndex: 1,
-                  animation: timer.isRunning ? 'typingBob 2s ease-in-out infinite' : 'floatGentle 4s ease-in-out infinite',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                <ChibiCharacter
-                  avatar={avatar}
-                  size={190}
-                  activity={timer.isRunning ? (timer.phase === 'focus' ? 'typing' : 'sipping') : 'idle'}
+                <Character3D
+                  width={250}
+                  height={220}
+                  pose="desk"
+                  lighting="desk"
+                  showShadow={true}
+                  enableFloating={true}
+                  floatingSpeed={timer.isRunning ? 2.5 : 1.6}
+                  floatingIntensity={timer.isRunning ? 0.04 : 0.025}
+                  modelUrl={avatar.modelUrl}
                 />
               </div>
 
