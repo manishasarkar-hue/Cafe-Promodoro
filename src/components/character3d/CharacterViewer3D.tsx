@@ -7,7 +7,7 @@ interface CharacterViewer3DProps {
 }
 
 export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
-  height = 520,
+  height = 540,
   className = '',
 }) => {
   return (
@@ -15,7 +15,7 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
       style={{
         position: 'relative',
         width: '100%',
-        maxWidth: 420,
+        maxWidth: 440,
         margin: '0 auto',
       }}
       className={className}
@@ -26,7 +26,7 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
           width: '100%',
           borderRadius: '32px',
           overflow: 'hidden',
-          background: 'radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 238, 234, 0.6) 80%, rgba(255, 225, 218, 0.7) 100%)',
+          background: 'radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 238, 234, 0.65) 75%, rgba(255, 225, 218, 0.75) 100%)',
           border: '2px solid rgba(255, 255, 255, 0.95)',
           boxShadow: '0 20px 45px rgba(220, 160, 150, 0.2), inset 0 2px 10px rgba(255, 255, 255, 0.8)',
           touchAction: 'none',
@@ -36,7 +36,7 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
         <div
           style={{
             position: 'absolute',
-            top: 20,
+            top: 18,
             left: 20,
             fontSize: '1.3rem',
             animation: 'floatGentle 4s ease-in-out infinite',
@@ -49,9 +49,9 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
         <div
           style={{
             position: 'absolute',
-            top: 40,
-            right: 25,
-            fontSize: '1.4rem',
+            top: 24,
+            right: 22,
+            fontSize: '1.35rem',
             animation: 'sparkleTwinkle 3s ease-in-out infinite',
             zIndex: 10,
             pointerEvents: 'none',
@@ -62,8 +62,8 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
         <div
           style={{
             position: 'absolute',
-            bottom: 60,
-            left: 25,
+            bottom: 55,
+            left: 22,
             fontSize: '1.2rem',
             opacity: 0.8,
             zIndex: 10,
@@ -77,18 +77,18 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
         <div
           style={{
             position: 'absolute',
-            bottom: 12,
+            top: 52,
             left: '50%',
             transform: 'translateX(-50%)',
-            background: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(6px)',
+            background: 'rgba(255, 255, 255, 0.78)',
+            backdropFilter: 'blur(4px)',
             borderRadius: 'var(--radius-pill)',
-            padding: '0.22rem 0.75rem',
-            fontSize: '0.7rem',
+            padding: '0.2rem 0.65rem',
+            fontSize: '0.68rem',
             fontWeight: 600,
             color: '#8A5E52',
             border: '1px solid #FFE4DC',
-            boxShadow: '0 2px 8px rgba(180, 120, 110, 0.06)',
+            boxShadow: '0 2px 6px rgba(180, 120, 110, 0.05)',
             pointerEvents: 'none',
             zIndex: 10,
             display: 'flex',
@@ -100,6 +100,7 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
           <span>🖱️ Drag to rotate • Scroll to zoom</span>
         </div>
 
+        {/* Single Main Character3D Canvas with built-in controls (ZERO duplicate renders) */}
         <Character3D
           height={height}
           pose="standing"
@@ -109,20 +110,10 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
           showSparkles={true}
           interactive={true}
           autoRotate={true}
-          autoRotateSpeed={1.2}
+          autoRotateSpeed={1.0}
           enableFloating={true}
-          badgeText="Interactive 3D Avatar • model(1).glb"
-        />
-      </div>
-
-      <div style={{ marginTop: '0.85rem' }}>
-        <Character3D
-          pose="standing"
           showControls={true}
-          interactive={false}
-          enableFloating={true}
-          height={40}
-          style={{ height: 'auto', background: 'transparent' }}
+          badgeText="Custom 3D Avatar • model(1).glb"
         />
       </div>
     </div>

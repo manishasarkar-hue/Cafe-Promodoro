@@ -278,25 +278,25 @@ export const PersonalStudyPage: React.FC = () => {
                 zIndex: 2,
               }}
             >
-              {/* 3D Character sitting at desk */}
+              {/* Full 3D Character standing naturally at study desk */}
               <div
                 style={{
-                  marginBottom: -22,
                   zIndex: 1,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  marginBottom: -15,
                 }}
               >
                 <Character3D
-                  width={250}
-                  height={220}
-                  pose="desk"
+                  width={280}
+                  height={380}
+                  pose="standing"
                   lighting="desk"
                   showShadow={true}
                   enableFloating={true}
-                  floatingSpeed={timer.isRunning ? 2.5 : 1.6}
-                  floatingIntensity={timer.isRunning ? 0.04 : 0.025}
+                  floatingSpeed={timer.isRunning ? 2.3 : 1.5}
+                  floatingIntensity={timer.isRunning ? 0.035 : 0.02}
                   modelUrl={avatar.modelUrl}
                 />
               </div>

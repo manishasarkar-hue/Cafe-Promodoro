@@ -461,6 +461,31 @@ export const AvatarPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Active Model Status Indicator */}
+          <div
+            style={{
+              background: stageMode === '3d' ? '#FFF5F0' : '#F5F8FF',
+              border: stageMode === '3d' ? '1.5px solid #FFD8CE' : '1.5px solid #D0DCFF',
+              borderRadius: '16px',
+              padding: '0.65rem 0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+            }}
+          >
+            <span style={{ fontSize: '1.25rem' }}>{stageMode === '3d' ? '🧸' : '🎨'}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#4A342B' }}>
+                {stageMode === '3d' ? 'Active: 3D Character Model (model(1).glb)' : 'Active: 2D Chibi Customizer'}
+              </div>
+              <div style={{ fontSize: '0.73rem', color: '#8C7A6B' }}>
+                {stageMode === '3d'
+                  ? 'Your authentic 3D character is active across all café rooms, desk sessions, and social tables.'
+                  : 'Customize your 2D chibi hairstyle, outfit colors, and accessories below.'}
+              </div>
+            </div>
+          </div>
+
           {/* ==================== 1. HAIR STYLE ROW ==================== */}
           <div>
             <div

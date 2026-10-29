@@ -413,9 +413,9 @@ export const SocialStudyPage: React.FC = () => {
                     /* User sits on left side */
                     <div style={{ textAlign: 'center', position: 'relative' }}>
                       <Character3D
-                        width={130}
-                        height={140}
-                        pose="compact"
+                        width={140}
+                        height={190}
+                        pose="standing"
                         lighting="cozy"
                         showShadow={true}
                         enableFloating={true}

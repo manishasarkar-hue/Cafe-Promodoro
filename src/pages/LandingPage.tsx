@@ -220,14 +220,14 @@ export const LandingPage: React.FC = () => {
               🍓
             </div>
 
-            {/* Cute Pair of Chibi Characters studying together */}
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '1.5rem', zIndex: 2 }}>
-              {/* 3D Character (User / Manisha) */}
-              <div style={{ textAlign: 'center' }}>
+            {/* Cute Pair of Characters studying together */}
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '1.25rem', marginBottom: '1.5rem', zIndex: 2, width: '100%', flexWrap: 'wrap' }}>
+              {/* Complete 3D Character (User) */}
+              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Character3D
-                  width={150}
-                  height={160}
-                  pose="compact"
+                  width={175}
+                  height={250}
+                  pose="standing"
                   showShadow={true}
                   enableFloating={true}
                   modelUrl={avatar.modelUrl}
