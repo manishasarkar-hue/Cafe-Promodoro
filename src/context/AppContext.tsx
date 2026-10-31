@@ -15,6 +15,7 @@ import {
 } from '../types';
 import { CAFES } from '../data/cafes';
 import { ALL_DRINKS } from '../data/drinks';
+import { getCharacterModel } from '../data/characterModels';
 import { audioEngine } from '../utils/audioEngine';
 
 const STORAGE_KEY = 'cafe_pomodoro_state_v1';
@@ -505,7 +506,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Avatar updates
   const updateAvatar = useCallback((updates: Partial<AvatarConfig>) => {
-    setAvatar((prev) => ({ ...prev, ...updates }));
+    setAvatar((prev) => {
+      const nextGender = updates.gender ?? prev.gender;
+      const modelUrl = updates.modelUrl ?? (updates.gender ? getCharacterModel(nextGender, 'standing') : prev.modelUrl);
+      return {
+        ...prev,
+        ...updates,
+        modelUrl,
+      };
+    });
   }, []);
 
   // Sound Studio controls

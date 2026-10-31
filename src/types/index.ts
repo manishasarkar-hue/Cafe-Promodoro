@@ -76,6 +76,7 @@ export interface CafeConfig {
   studySpots: StudySpot[];
   decorMotifs: string[];
   ambientVisualNotes: string;
+  backgroundImage?: string;
 }
 
 export type StudyMode = 'personal' | 'social';

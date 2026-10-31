@@ -1,15 +1,22 @@
 import React from 'react';
 import { Character3D } from '../avatar/Character3D';
 
+import { Gender } from '../../types';
+
 interface CharacterViewer3DProps {
+  gender?: Gender;
   height?: number | string;
   className?: string;
 }
 
 export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
+  gender = 'girl',
   height = 540,
   className = '',
 }) => {
+  const isBoy = gender === 'boy';
+  const badgeText = isBoy ? 'Boy Character • model(3).glb' : 'Girl Character • model(1).glb';
+
   return (
     <div
       style={{
@@ -44,7 +51,7 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
             pointerEvents: 'none',
           }}
         >
-          🌸
+          {isBoy ? '🌿' : '🌸'}
         </div>
         <div
           style={{
@@ -102,6 +109,8 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
 
         {/* Single Main Character3D Canvas with built-in controls (ZERO duplicate renders) */}
         <Character3D
+          key={gender}
+          gender={gender}
           height={height}
           pose="standing"
           lighting="cozy"
@@ -113,7 +122,7 @@ export const CharacterViewer3D: React.FC<CharacterViewer3DProps> = ({
           autoRotateSpeed={1.0}
           enableFloating={true}
           showControls={true}
-          badgeText="Custom 3D Avatar • model(1).glb"
+          badgeText={badgeText}
         />
       </div>
     </div>

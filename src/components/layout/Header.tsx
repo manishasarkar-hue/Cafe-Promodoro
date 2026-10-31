@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { NavigationScreen } from '../../types';
 import { Character3D } from '../avatar/Character3D';
+import { getCharacterModel } from '../../data/characterModels';
 import {
   Sparkles,
   Headphones,
@@ -299,12 +300,14 @@ export const Header: React.FC = () => {
                 }}
               >
                 <Character3D
+                  key={avatar.gender}
+                  gender={avatar.gender}
                   width={26}
                   height={26}
                   pose="compact"
                   showShadow={false}
                   enableFloating={false}
-                  modelUrl={avatar.modelUrl}
+                  modelUrl={getCharacterModel(avatar.gender, 'compact')}
                 />
               </div>
               <span style={{ maxWidth: 85, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

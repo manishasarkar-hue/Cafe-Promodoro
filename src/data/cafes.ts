@@ -21,6 +21,7 @@ export const CAFES: Record<CafeId, CafeConfig> = {
       shadow: '0 8px 24px rgba(255, 117, 143, 0.25)',
     },
     recommendedSoundId: 'cafe_chatter',
+    backgroundImage: '/images/cafe-backgrounds/strawberry-cafe.jpg',
     decorMotifs: ['Strawberry Cushions', 'Silk Pastel Ribbons', 'Pink Daisy Vases', 'Sunlit Lace Curtains'],
     ambientVisualNotes: 'Soft pink light filters through lace blinds, gentle strawberry-shaped steam rises.',
     drinks: [
@@ -84,6 +85,7 @@ export const CAFES: Record<CafeId, CafeConfig> = {
       shadow: '0 8px 24px rgba(111, 78, 55, 0.22)',
     },
     recommendedSoundId: 'fireplace',
+    backgroundImage: '/images/cafe-backgrounds/mocha-house.jpg',
     decorMotifs: ['Hardcover Bookshelves', 'Warm Amber Lanterns', 'Vintage Espresso Grinder', 'Fleece Throw Blankets'],
     ambientVisualNotes: 'Amber fireplace glow flickers gently, clock ticks softly in the corner.',
     drinks: [
@@ -147,6 +149,7 @@ export const CAFES: Record<CafeId, CafeConfig> = {
       shadow: '0 8px 24px rgba(45, 106, 79, 0.2)',
     },
     recommendedSoundId: 'forest_birds',
+    backgroundImage: '/images/cafe-backgrounds/matcha-garden.jpg',
     decorMotifs: ['Dewy Bonsai Plants', 'Bamboo Water Fountain', 'Stone Lanterns', 'Hanging Fern Baskets'],
     ambientVisualNotes: 'Soft green leaves gently sway in the morning light, droplets bead on glass.',
     drinks: [
@@ -210,6 +213,7 @@ export const CAFES: Record<CafeId, CafeConfig> = {
       shadow: '0 8px 24px rgba(67, 97, 238, 0.22)',
     },
     recommendedSoundId: 'rain_window',
+    backgroundImage: '/images/cafe-backgrounds/blue-moon-cafe.jpg',
     decorMotifs: ['Crescent Moon Lamp', 'Fairy Star Strings', 'Rainy Glass Panes', 'Lavender Velvet Cushions'],
     ambientVisualNotes: 'Raindrops race down glass panels, starlight twinkles softly across your notes.',
     drinks: [

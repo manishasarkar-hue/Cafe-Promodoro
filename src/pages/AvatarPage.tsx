@@ -78,22 +78,27 @@ const EXPRESSIONS: { id: Expression; label: string; emoji: string }[] = [
   { id: 'thinking', label: 'Thinking', emoji: '💭' },
 ];
 
+import { getCharacterModel } from '../data/characterModels';
+
 export const AvatarPage: React.FC = () => {
   const { avatar, updateAvatar, setScreen, navigateWithCheck } = useApp();
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [stageMode, setStageMode] = useState<'3d' | '2d'>('3d');
 
-  const handleGenderToggle = (g: Gender) => {
+  const handleGenderSelect = (g: Gender) => {
     updateAvatar({
       gender: g,
+      modelUrl: getCharacterModel(g, 'standing'),
       hairStyle: g === 'girl' ? 'wavy' : 'messy',
+      is3D: true,
     });
   };
 
   const handleConfirmNext = () => {
     updateAvatar({
-      modelUrl: '/models/model(1).glb',
+      gender: avatar.gender,
+      modelUrl: getCharacterModel(avatar.gender, 'standing'),
       is3D: true,
     });
     setScreen('cafe');
@@ -209,8 +214,76 @@ export const AvatarPage: React.FC = () => {
 
           {/* Conditional Stage Content: 3D Viewer or 2D Chibi */}
           {stageMode === '3d' ? (
-            <div style={{ width: '100%', position: 'relative', zIndex: 2 }}>
-              <CharacterViewer3D height={520} />
+            <div style={{ width: '100%', position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <CharacterViewer3D gender={avatar.gender} height={520} />
+
+              {/* Exactly Two Choices: Girl and Boy */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.85rem',
+                  marginTop: '1.25rem',
+                  width: '100%',
+                  maxWidth: 420,
+                }}
+              >
+                <button
+                  type="button"
+                  id="avatar-select-girl"
+                  onClick={() => handleGenderSelect('girl')}
+                  style={{
+                    flex: 1,
+                    padding: '0.85rem 1rem',
+                    borderRadius: '20px',
+                    border: avatar.gender === 'girl' ? '2.5px solid #FF758F' : '2px solid #FFE4DC',
+                    background: avatar.gender === 'girl' ? 'linear-gradient(135deg, #FFF0F4 0%, #FFE2EA 100%)' : '#FFFFFF',
+                    boxShadow: avatar.gender === 'girl' ? '0 8px 20px rgba(255, 117, 143, 0.28)' : '0 2px 8px rgba(180, 120, 110, 0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    cursor: 'pointer',
+                    fontWeight: 800,
+                    fontSize: '0.95rem',
+                    color: avatar.gender === 'girl' ? '#D85770' : '#7A4E42',
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transform: avatar.gender === 'girl' ? 'scale(1.02)' : 'none',
+                  }}
+                >
+                  <span style={{ fontSize: '1.3rem' }}>🌸</span>
+                  <span>Girl</span>
+                  {avatar.gender === 'girl' && <Check size={16} color="#D85770" strokeWidth={3} />}
+                </button>
+
+                <button
+                  type="button"
+                  id="avatar-select-boy"
+                  onClick={() => handleGenderSelect('boy')}
+                  style={{
+                    flex: 1,
+                    padding: '0.85rem 1rem',
+                    borderRadius: '20px',
+                    border: avatar.gender === 'boy' ? '2.5px solid #52B788' : '2px solid #D8F3DC',
+                    background: avatar.gender === 'boy' ? 'linear-gradient(135deg, #F0FFF4 0%, #D8F3DC 100%)' : '#FFFFFF',
+                    boxShadow: avatar.gender === 'boy' ? '0 8px 20px rgba(82, 183, 136, 0.28)' : '0 2px 8px rgba(180, 120, 110, 0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    cursor: 'pointer',
+                    fontWeight: 800,
+                    fontSize: '0.95rem',
+                    color: avatar.gender === 'boy' ? '#2D6A4F' : '#7A4E42',
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transform: avatar.gender === 'boy' ? 'scale(1.02)' : 'none',
+                  }}
+                >
+                  <span style={{ fontSize: '1.3rem' }}>🌿</span>
+                  <span>Boy</span>
+                  {avatar.gender === 'boy' && <Check size={16} color="#2D6A4F" strokeWidth={3} />}
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -303,7 +376,7 @@ export const AvatarPage: React.FC = () => {
                 }}
               >
                 <button
-                  onClick={() => handleGenderToggle(avatar.gender === 'girl' ? 'boy' : 'girl')}
+                  onClick={() => handleGenderSelect(avatar.gender === 'girl' ? 'boy' : 'girl')}
                   style={{
                     width: 38,
                     height: 38,
@@ -341,7 +414,7 @@ export const AvatarPage: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={() => handleGenderToggle(avatar.gender === 'girl' ? 'boy' : 'girl')}
+                  onClick={() => handleGenderSelect(avatar.gender === 'girl' ? 'boy' : 'girl')}
                   style={{
                     width: 38,
                     height: 38,
@@ -464,25 +537,134 @@ export const AvatarPage: React.FC = () => {
           {/* Active Model Status Indicator */}
           <div
             style={{
-              background: stageMode === '3d' ? '#FFF5F0' : '#F5F8FF',
-              border: stageMode === '3d' ? '1.5px solid #FFD8CE' : '1.5px solid #D0DCFF',
+              background: avatar.gender === 'boy' ? '#F0FFF4' : '#FFF5F0',
+              border: avatar.gender === 'boy' ? '1.5px solid #C6EED5' : '1.5px solid #FFD8CE',
               borderRadius: '16px',
-              padding: '0.65rem 0.95rem',
+              padding: '0.75rem 1rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.65rem',
+              gap: '0.75rem',
             }}
           >
-            <span style={{ fontSize: '1.25rem' }}>{stageMode === '3d' ? '🧸' : '🎨'}</span>
+            <span style={{ fontSize: '1.35rem' }}>{avatar.gender === 'boy' ? '🌿' : '🌸'}</span>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#4A342B' }}>
-                {stageMode === '3d' ? 'Active: 3D Character Model (model(1).glb)' : 'Active: 2D Chibi Customizer'}
+              <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#4A342B' }}>
+                {avatar.gender === 'boy'
+                  ? 'Active: Boy Character (model(3).glb standing • model (4).glb sitting)'
+                  : 'Active: Girl Character (model(1).glb standing • model(2).glb sitting)'}
               </div>
-              <div style={{ fontSize: '0.73rem', color: '#8C7A6B' }}>
-                {stageMode === '3d'
-                  ? 'Your authentic 3D character is active across all café rooms, desk sessions, and social tables.'
-                  : 'Customize your 2D chibi hairstyle, outfit colors, and accessories below.'}
+              <div style={{ fontSize: '0.75rem', color: '#8C7A6B' }}>
+                Your character selection stays active across all café study desks, rooms, and sessions.
               </div>
+            </div>
+          </div>
+
+          {/* ==================== TWO CHOICES: GIRL & BOY ==================== */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.92rem',
+                fontWeight: 700,
+                color: '#4A342B',
+                marginBottom: '0.75rem',
+              }}
+            >
+              <User size={16} color="#FF758F" />
+              <span>Select Character</span>
+              <span style={{ fontSize: '0.75rem', color: '#9C7A6E', fontWeight: 500 }}>
+                (Choose Girl or Boy)
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+              <button
+                type="button"
+                id="panel-select-girl"
+                onClick={() => handleGenderSelect('girl')}
+                style={{
+                  padding: '0.9rem',
+                  borderRadius: '20px',
+                  border: avatar.gender === 'girl' ? '2.5px solid #FF758F' : '1.5px solid #F0DCD4',
+                  background: avatar.gender === 'girl' ? 'linear-gradient(135deg, #FFF0F4 0%, #FFE2EA 100%)' : '#FFFDFB',
+                  boxShadow: avatar.gender === 'girl' ? '0 8px 24px rgba(255, 117, 143, 0.25)' : '0 2px 8px rgba(180, 130, 120, 0.06)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  transform: avatar.gender === 'girl' ? 'translateY(-2px)' : 'none',
+                }}
+              >
+                <div style={{ fontSize: '1.8rem' }}>🌸</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: avatar.gender === 'girl' ? '#D85770' : '#4A342B' }}>
+                  Girl
+                </div>
+                <div style={{ fontSize: '0.7rem', color: '#8C7A6B' }}>
+                  model(1).glb • model(2).glb
+                </div>
+                {avatar.gender === 'girl' && (
+                  <span
+                    style={{
+                      marginTop: '0.2rem',
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      color: '#D85770',
+                      background: 'rgba(255, 255, 255, 0.9)',
+                      padding: '0.2rem 0.65rem',
+                      borderRadius: 'var(--radius-pill)',
+                    }}
+                  >
+                    ✓ Selected
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                id="panel-select-boy"
+                onClick={() => handleGenderSelect('boy')}
+                style={{
+                  padding: '0.9rem',
+                  borderRadius: '20px',
+                  border: avatar.gender === 'boy' ? '2.5px solid #52B788' : '1.5px solid #F0DCD4',
+                  background: avatar.gender === 'boy' ? 'linear-gradient(135deg, #F0FFF4 0%, #D8F3DC 100%)' : '#FFFDFB',
+                  boxShadow: avatar.gender === 'boy' ? '0 8px 24px rgba(82, 183, 136, 0.25)' : '0 2px 8px rgba(180, 130, 120, 0.06)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  transform: avatar.gender === 'boy' ? 'translateY(-2px)' : 'none',
+                }}
+              >
+                <div style={{ fontSize: '1.8rem' }}>🌿</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: avatar.gender === 'boy' ? '#2D6A4F' : '#4A342B' }}>
+                  Boy
+                </div>
+                <div style={{ fontSize: '0.7rem', color: '#8C7A6B' }}>
+                  model(3).glb • model (4).glb
+                </div>
+                {avatar.gender === 'boy' && (
+                  <span
+                    style={{
+                      marginTop: '0.2rem',
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      color: '#2D6A4F',
+                      background: 'rgba(255, 255, 255, 0.9)',
+                      padding: '0.2rem 0.65rem',
+                      borderRadius: 'var(--radius-pill)',
+                    }}
+                  >
+                    ✓ Selected
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 

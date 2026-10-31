@@ -5,6 +5,7 @@ import { CAFES } from '../data/cafes';
 import { VirtualStudent } from '../types';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
 import { Character3D } from '../components/avatar/Character3D';
+import { getCharacterModel } from '../data/characterModels';
 import { DrinkCup } from '../components/chibi/DrinkCup';
 import {
   Users,
@@ -413,15 +414,17 @@ export const SocialStudyPage: React.FC = () => {
                     /* User sits on left side */
                     <div style={{ textAlign: 'center', position: 'relative' }}>
                       <Character3D
+                        key={avatar.gender}
+                        gender={avatar.gender}
                         width={140}
                         height={190}
-                        pose="standing"
+                        pose="sitting"
                         lighting="cozy"
                         showShadow={true}
                         enableFloating={true}
                         floatingSpeed={timer.isRunning ? 2.3 : 1.6}
                         floatingIntensity={0.03}
-                        modelUrl={avatar.modelUrl}
+                        modelUrl={getCharacterModel(avatar.gender, 'sitting')}
                       />
                       <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--c-strawberry-dark)', marginTop: '0.25rem' }}>
                         {avatar.name} (You)

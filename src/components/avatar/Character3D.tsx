@@ -11,25 +11,26 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
-// Single source of truth for the user's actual 3D character model
-export const DEFAULT_MODEL_URL = '/models/model(1).glb';
-export const FALLBACK_MODEL_URL = '/models/model (1).glb';
+import { getCharacterModel, CHARACTER_MODELS } from '../../data/characterModels';
+import { Gender } from '../../types';
 
-// Preload the GLB immediately at module load time to avoid re-fetching across screens
+// Preload all four final character models to ensure instant zero-latency rendering
 try {
-  useGLTF.preload(DEFAULT_MODEL_URL);
+  useGLTF.preload(CHARACTER_MODELS.girl.standing);
+  useGLTF.preload(CHARACTER_MODELS.girl.sitting);
+  useGLTF.preload(CHARACTER_MODELS.boy.standing);
+  useGLTF.preload(CHARACTER_MODELS.boy.sitting);
 } catch {
-  try {
-    useGLTF.preload(FALLBACK_MODEL_URL);
-  } catch {
-    // Handled by Suspense & error boundary
-  }
+  // Handled by Suspense & error boundary
 }
 
-export type CharacterPose = 'full' | 'standing' | 'desk' | 'compact';
+export type CharacterPose = 'full' | 'standing' | 'desk' | 'sitting' | 'compact';
 export type LightingPreset = 'cozy' | 'desk' | 'sunset' | 'night';
 
 export interface Character3DProps {
+  // Character Gender mapping (girl vs boy)
+  gender?: Gender;
+
   // Dimensions
   width?: number | string;
   height?: number | string;
@@ -462,6 +463,7 @@ const ModelErrorDisplay: React.FC<{ onRetry: () => void; compact?: boolean }> = 
  * Reusable Unified 3D Character Component
  */
 export const Character3D: React.FC<Character3DProps> = ({
+  gender = 'girl',
   width,
   height,
   size,
@@ -485,11 +487,13 @@ export const Character3D: React.FC<Character3DProps> = ({
   floatingIntensity = 0.03,
   showControls = false,
   badgeText,
-  modelUrl = DEFAULT_MODEL_URL,
+  modelUrl,
   className = '',
   style = {},
 }) => {
-  const [activeUrl, setActiveUrl] = useState(modelUrl);
+  // Resolve model URL from centralized config if not explicitly provided
+  const resolvedUrl = modelUrl || getCharacterModel(gender, pose);
+  const [activeUrl, setActiveUrl] = useState(resolvedUrl);
   const [isRotating, setIsRotating] = useState(autoRotate);
   const [isFloatingActive, setIsFloatingActive] = useState(enableFloating);
   const [hasError, setHasError] = useState(false);
@@ -499,8 +503,8 @@ export const Character3D: React.FC<Character3DProps> = ({
 
   // Sync external changes
   useEffect(() => {
-    setActiveUrl(modelUrl);
-  }, [modelUrl]);
+    setActiveUrl(modelUrl || getCharacterModel(gender, pose));
+  }, [modelUrl, gender, pose]);
 
   // Determine container dimensions
   const finalWidth = size ?? width ?? (pose === 'compact' ? 120 : '100%');
@@ -524,7 +528,7 @@ export const Character3D: React.FC<Character3DProps> = ({
 
   const handleRetry = () => {
     setHasError(false);
-    setActiveUrl((prev) => (prev === DEFAULT_MODEL_URL ? FALLBACK_MODEL_URL : DEFAULT_MODEL_URL));
+    setActiveUrl(modelUrl || getCharacterModel(gender, pose));
     setRetryCount((c) => c + 1);
   };
 

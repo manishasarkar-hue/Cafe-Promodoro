@@ -5,6 +5,7 @@ import { StudySpot } from '../types';
 import { CafeSceneIllustration } from '../components/scenes/CafeSceneIllustration';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
 import { Character3D } from '../components/avatar/Character3D';
+import { getCharacterModel } from '../data/characterModels';
 import { DrinkCup } from '../components/chibi/DrinkCup';
 import {
   Sparkles,
@@ -241,12 +242,14 @@ export const CafeOverviewPage: React.FC = () => {
               }}
             >
               <Character3D
+                key={avatar.gender}
+                gender={avatar.gender}
                 width={52}
                 height={52}
                 pose="compact"
                 showShadow={false}
                 enableFloating={true}
-                modelUrl={avatar.modelUrl}
+                modelUrl={getCharacterModel(avatar.gender, 'compact')}
               />
             </div>
 
@@ -317,12 +320,14 @@ export const CafeOverviewPage: React.FC = () => {
                 }}
               >
                 <Character3D
+                  key={avatar.gender}
+                  gender={avatar.gender}
                   width={52}
                   height={52}
                   pose="compact"
                   showShadow={false}
                   enableFloating={true}
-                  modelUrl={avatar.modelUrl}
+                  modelUrl={getCharacterModel(avatar.gender, 'compact')}
                 />
               </div>
               {orderedDrink && (

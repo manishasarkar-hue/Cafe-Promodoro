@@ -1,6 +1,7 @@
 import React from 'react';
 import { CafeConfig, StudySpot, AvatarConfig } from '../../types';
 import { Character3D } from '../avatar/Character3D';
+import { getCharacterModel } from '../../data/characterModels';
 import { Sparkles, Compass, MapPin } from 'lucide-react';
 
 interface CafeSceneIllustrationProps {
@@ -321,12 +322,14 @@ export const CafeSceneIllustration: React.FC<CafeSceneIllustrationProps> = ({
                 >
                   {isSelected ? (
                     <Character3D
+                      key={avatar?.gender}
+                      gender={avatar?.gender}
                       width={50}
                       height={50}
                       pose="compact"
                       showShadow={false}
                       enableFloating={true}
-                      modelUrl={avatar?.modelUrl}
+                      modelUrl={avatar?.gender ? getCharacterModel(avatar.gender, 'compact') : undefined}
                     />
                   ) : (
                     <MapPin size={20} />

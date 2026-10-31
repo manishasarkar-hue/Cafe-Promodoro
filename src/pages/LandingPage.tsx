@@ -2,6 +2,7 @@ import React from 'react';
 import { useApp } from '../context/AppContext';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
 import { Character3D } from '../components/avatar/Character3D';
+import { getCharacterModel } from '../data/characterModels';
 import { DrinkCup } from '../components/chibi/DrinkCup';
 import { ALL_DRINKS } from '../data/drinks';
 import { CAFES } from '../data/cafes';
@@ -225,12 +226,14 @@ export const LandingPage: React.FC = () => {
               {/* Complete 3D Character (User) */}
               <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Character3D
+                  key={avatar.gender}
+                  gender={avatar.gender}
                   width={175}
                   height={250}
                   pose="standing"
                   showShadow={true}
                   enableFloating={true}
-                  modelUrl={avatar.modelUrl}
+                  modelUrl={getCharacterModel(avatar.gender, 'standing')}
                 />
                 <div
                   style={{
@@ -421,6 +424,30 @@ export const LandingPage: React.FC = () => {
                     <Coffee size={16} />
                   </div>
                 </div>
+
+                {/* Scenic Background Thumbnail */}
+                {cafe.backgroundImage && (
+                  <div
+                    style={{
+                      height: 110,
+                      borderRadius: 'var(--radius-md)',
+                      overflow: 'hidden',
+                      marginBottom: '0.85rem',
+                      border: `1px solid ${cafe.theme.border}`,
+                    }}
+                  >
+                    <img
+                      src={cafe.backgroundImage}
+                      alt={cafe.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
 
                 <h3
                   style={{

@@ -5,6 +5,8 @@ import { COLLECTIBLES } from '../data/collectibles';
 import { CollectibleItem, PomodoroMode } from '../types';
 import { ChibiCharacter } from '../components/chibi/ChibiCharacter';
 import { Character3D } from '../components/avatar/Character3D';
+import { getCharacterModel } from '../data/characterModels';
+import { getCafeBackground } from '../data/cafeBackgrounds';
 import { DrinkCup } from '../components/chibi/DrinkCup';
 import confetti from 'canvas-confetti';
 import {
@@ -26,6 +28,7 @@ import {
 export const PersonalStudyPage: React.FC = () => {
   const {
     selectedCafeId,
+    setSelectedCafeId,
     selectedSpot,
     orderedDrink,
     avatar,
@@ -47,6 +50,7 @@ export const PersonalStudyPage: React.FC = () => {
   } = useApp();
 
   const currentCafe = CAFES[selectedCafeId];
+  const cafeBg = getCafeBackground(currentCafe.id);
   const spot = selectedSpot || currentCafe.studySpots[0];
 
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
@@ -161,21 +165,71 @@ export const PersonalStudyPage: React.FC = () => {
             </button>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+            {/* Quick Café Switcher */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                background: 'rgba(255, 255, 255, 0.92)',
+                padding: '0.22rem 0.35rem',
+                borderRadius: 'var(--radius-pill)',
+                border: '1.5px solid var(--c-cream-border)',
+                boxShadow: 'var(--shadow-soft)',
+              }}
+            >
+              {(['strawberry', 'mocha', 'matcha', 'blue-moon'] as const).map((cId) => {
+                const isCurrent = currentCafe.id === cId;
+                const cConfig = CAFES[cId];
+                const icons: Record<string, string> = {
+                  strawberry: '🍓',
+                  mocha: '☕',
+                  matcha: '🍵',
+                  'blue-moon': '🌙',
+                };
+                return (
+                  <button
+                    key={cId}
+                    type="button"
+                    onClick={() => setSelectedCafeId(cId)}
+                    title={`Switch to ${cConfig.name}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                      padding: '0.3rem 0.65rem',
+                      borderRadius: 'var(--radius-pill)',
+                      fontSize: '0.78rem',
+                      fontWeight: isCurrent ? 800 : 600,
+                      background: isCurrent ? cConfig.theme.primaryLight : 'transparent',
+                      border: isCurrent ? `1.5px solid ${cConfig.theme.primary}` : 'none',
+                      color: isCurrent ? cConfig.theme.textPrimary : '#6B584C',
+                      cursor: 'pointer',
+                      transition: 'all 0.18s ease',
+                    }}
+                  >
+                    <span>{icons[cId]}</span>
+                    <span>{cConfig.name.replace(' Café', '').replace(' House', '')}</span>
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Spot Name Tag */}
             <div
               style={{
                 background: 'rgba(255, 255, 255, 0.9)',
                 borderRadius: 'var(--radius-pill)',
-                padding: '0.4rem 1rem',
-                fontSize: '0.85rem',
+                padding: '0.4rem 0.95rem',
+                fontSize: '0.82rem',
                 fontWeight: 700,
                 color: currentCafe.theme.textPrimary,
                 border: `1.5px solid ${currentCafe.theme.border}`,
                 boxShadow: 'var(--shadow-soft)',
               }}
             >
-              📍 {currentCafe.name} • {spot.name}
+              📍 {spot.name}
             </div>
 
             {/* Ambient Sound Trigger */}
@@ -189,14 +243,14 @@ export const PersonalStudyPage: React.FC = () => {
                 borderRadius: 'var(--radius-pill)',
                 background: '#FFFFFF',
                 border: '1.5px solid var(--c-cream-border)',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 fontWeight: 600,
                 color: '#4A3525',
                 boxShadow: 'var(--shadow-soft)',
               }}
             >
               <Headphones size={15} color={currentCafe.theme.accent} />
-              <span>{activeTrackId ? 'Ambience Playing' : 'Ambient Audio'}</span>
+              <span>{activeTrackId ? 'Ambience' : 'Audio'}</span>
             </button>
           </div>
         </div>
@@ -210,59 +264,129 @@ export const PersonalStudyPage: React.FC = () => {
             alignItems: 'center',
           }}
         >
-          {/* Left: Illustrated Study Desk Scene */}
+          {/* Left: Scenic Illustrated Study Desk Scene */}
           <div
             style={{
               position: 'relative',
-              background: currentCafe.theme.roomBg,
               borderRadius: 'var(--radius-lg)',
               border: `3px solid ${currentCafe.theme.border}`,
               boxShadow: currentCafe.theme.shadow,
-              padding: '3rem 2rem 2.5rem',
+              padding: '2.5rem 1.5rem 2rem',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               overflow: 'hidden',
-              minHeight: 460,
+              minHeight: 520,
               justifyContent: 'flex-end',
+              background: currentCafe.theme.roomBg,
             }}
           >
-            {/* Background Spot Lighting Glow */}
+            {/* 1. High-Resolution Scenic Café Environment Background */}
             <div
+              key={currentCafe.id}
               style={{
                 position: 'absolute',
-                top: 20,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 280,
-                height: 180,
-                borderRadius: '50%',
-                background: currentCafe.theme.primaryLight,
-                filter: 'blur(45px)',
-                opacity: 0.7,
-                pointerEvents: 'none',
+                inset: 0,
+                backgroundImage: `url(${cafeBg.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center bottom',
+                backgroundRepeat: 'no-repeat',
+                zIndex: 0,
+                transition: 'background-image 0.4s ease-in-out',
               }}
             />
 
-            {/* Floating Motifs / Flowers / Sparkles */}
+            {/* 2. Soft Ambient Depth Vignette for natural focus */}
             <div
               style={{
                 position: 'absolute',
-                top: 25,
-                left: 30,
-                fontSize: '1.4rem',
-                animation: 'floatGentle 4s ease-in-out infinite',
+                inset: 0,
+                background: cafeBg.vignette,
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+
+            {/* 3. Subtle Atmospheric Color Grade Scrim */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: cafeBg.accentOverlay,
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+
+            {/* 4. Studio Silhouette Backlight behind Character for crystal-clear contrast */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '40%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 320,
+                height: 320,
+                borderRadius: '50%',
+                background: currentCafe.id === 'blue-moon'
+                  ? 'radial-gradient(circle, rgba(190, 210, 255, 0.28) 0%, rgba(120, 150, 255, 0.08) 50%, transparent 75%)'
+                  : 'radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.15) 50%, transparent 75%)',
+                filter: 'blur(28px)',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+
+            {/* 5. Natural Floor Shadow beneath Desk for grounding */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 140,
+                background: 'linear-gradient(to top, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.12) 60%, transparent 100%)',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+
+            {/* Top-Left Ambient Pill Badge */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 16,
+                left: 18,
+                background: 'rgba(255, 255, 255, 0.88)',
+                backdropFilter: 'blur(8px)',
+                border: `1.5px solid ${currentCafe.theme.border}`,
+                borderRadius: 'var(--radius-pill)',
+                padding: '0.35rem 0.85rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: currentCafe.theme.textPrimary,
+                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.12)',
+                zIndex: 5,
+                pointerEvents: 'none',
               }}
             >
-              🌿
+              <span>{currentCafe.id === 'strawberry' ? '🍓' : currentCafe.id === 'mocha' ? '☕' : currentCafe.id === 'matcha' ? '🍵' : '🌙'}</span>
+              <span>{currentCafe.name}</span>
             </div>
+
+            {/* Top-Right Sparkle Accent */}
             <div
               style={{
                 position: 'absolute',
-                top: 35,
-                right: 35,
-                fontSize: '1.5rem',
+                top: 18,
+                right: 20,
+                fontSize: '1.3rem',
                 animation: 'sparkleTwinkle 3s ease-in-out infinite',
+                zIndex: 5,
+                pointerEvents: 'none',
               }}
             >
               ✨
@@ -276,41 +400,44 @@ export const PersonalStudyPage: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 zIndex: 2,
+                width: '100%',
               }}
             >
-              {/* Full 3D Character standing naturally at study desk */}
+              {/* Full 3D Character sitting naturally at study desk */}
               <div
                 style={{
-                  zIndex: 1,
+                  zIndex: 2,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: -15,
+                  marginBottom: -18,
                 }}
               >
                 <Character3D
-                  width={280}
+                  key={`${avatar.gender}-${currentCafe.id}`}
+                  gender={avatar.gender}
+                  width={290}
                   height={380}
-                  pose="standing"
-                  lighting="desk"
+                  pose="sitting"
+                  lighting={cafeBg.lightingPreset}
                   showShadow={true}
                   enableFloating={true}
                   floatingSpeed={timer.isRunning ? 2.3 : 1.5}
                   floatingIntensity={timer.isRunning ? 0.035 : 0.02}
-                  modelUrl={avatar.modelUrl}
+                  modelUrl={getCharacterModel(avatar.gender, 'sitting')}
                 />
               </div>
 
               {/* Wooden Study Desk Surface */}
               <div
                 style={{
-                  width: 340,
+                  width: 350,
                   maxWidth: '92vw',
-                  height: 90,
+                  height: 94,
                   background: 'linear-gradient(180deg, #DDB892 0%, #B08968 100%)',
-                  borderRadius: '16px 16px 8px 8px',
+                  borderRadius: '16px 16px 10px 10px',
                   border: '3px solid #7F4F24',
-                  boxShadow: '0 12px 30px rgba(80, 50, 40, 0.25)',
+                  boxShadow: cafeBg.deskShadow,
                   position: 'relative',
                   display: 'flex',
                   alignItems: 'center',

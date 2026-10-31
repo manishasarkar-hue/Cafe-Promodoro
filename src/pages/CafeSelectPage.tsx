@@ -156,6 +156,39 @@ export const CafeSelectPage: React.FC = () => {
                   </span>
                 </div>
 
+                {/* Scenic Background Preview */}
+                {cafe.backgroundImage && (
+                  <div
+                    style={{
+                      position: 'relative',
+                      height: 120,
+                      borderRadius: 'var(--radius-md)',
+                      overflow: 'hidden',
+                      marginBottom: '0.9rem',
+                      border: `1.5px solid ${cafe.theme.border}`,
+                      boxShadow: '0 3px 10px rgba(0,0,0,0.06)',
+                    }}
+                  >
+                    <img
+                      src={cafe.backgroundImage}
+                      alt={cafe.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                      loading="lazy"
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 60%)',
+                      }}
+                    />
+                  </div>
+                )}
+
                 {/* Cafe Name & Tagline */}
                 <h2
                   style={{
